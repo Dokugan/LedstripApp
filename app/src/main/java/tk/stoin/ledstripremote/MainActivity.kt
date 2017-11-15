@@ -1,5 +1,6 @@
 package tk.stoin.ledstripremote
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -28,7 +29,13 @@ class MainActivity : AppCompatActivity() {
             handler.getControllers(address.text.toString(), {
 
                 //on success
-
+                val intent = Intent(this, ListActivity::class.java)
+                val bundle = Bundle()
+                bundle.putSerializable("controllers", it)
+                intent.putExtras(bundle)
+                startActivity(intent)
+                loadWidget.visibility = View.INVISIBLE
+                button.visibility = View.VISIBLE
 
             }, {
                 //onFail

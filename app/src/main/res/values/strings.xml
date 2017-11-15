@@ -3,4 +3,5 @@
     <string name="server_address">Server Address</string>
     <string name="connect">Connect</string>
     <string name="connection_error">Failed To Connect</string>
+    <string name="add_color_button">Add Color Button</string>
 </resources>

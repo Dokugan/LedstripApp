@@ -14,7 +14,7 @@ class HttpHandler(context: Context){
     var queue: RequestQueue
 
     fun getControllers(url: String, onDataReceived: (Array<LedControllerStatus>) -> Unit, onFail: () -> Unit){
-        val stringRequest = StringRequest(Request.Method.GET, url,
+        val stringRequest = StringRequest(Request.Method.GET, url + "/controllers",
                 object : Response.Listener<String> {
                     override fun onResponse(response: String?) {
                         val controllers = Gson().fromJson(response, Array<LedControllerStatus>::class.java)
