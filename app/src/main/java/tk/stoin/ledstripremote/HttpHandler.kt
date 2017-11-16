@@ -13,20 +13,43 @@ class HttpHandler(context: Context){
 
     var queue: RequestQueue
 
-    fun getControllers(url: String, onDataReceived: (Array<LedControllerStatus>) -> Unit, onFail: () -> Unit){
-        val stringRequest = StringRequest(Request.Method.GET, url + "/controllers",
-                object : Response.Listener<String> {
-                    override fun onResponse(response: String?) {
-                        val controllers = Gson().fromJson(response, Array<LedControllerStatus>::class.java)
-                        onDataReceived(controllers)
-                    }
+    fun getControllers(onDataReceived: (Array<LedControllerStatus>) -> Unit, onFail: () -> Unit){
+        if (!MainActivity.serverAddress.isBlank() && !MainActivity.serverAddress.isEmpty()) {
+            val stringRequest = StringRequest(Request.Method.GET, MainActivity.serverAddress + "/controllers",
+                    object : Response.Listener<String> {
+                        override fun onResponse(response: String?) {
+                            val controllers = Gson().fromJson(response, Array<LedControllerStatus>::class.java)
+                            onDataReceived(controllers)
+                        }
+                    }, object : Response.ErrorListener{
+                override fun onErrorResponse(error: VolleyError?) {
+                    onFail()
+                }
+            })
+            queue.add(stringRequest)
+        } else onFail()
+    }
 
-                }, object : Response.ErrorListener{
-            override fun onErrorResponse(error: VolleyError?) {
-                onFail()
+    fun updateController(controller: LedControllerStatus ,onSucces: () -> Unit, onFail: () -> Unit){
+
+        if (!MainActivity.serverAddress.isBlank() && !MainActivity.serverAddress.isEmpty()){
+            val stringRequest = object : StringRequest(Request.Method.POST, MainActivity.serverAddress + "/controller?id=${controller.id}",
+                    object : Response.Listener<String>{
+                        override fun onResponse(response: String?) {
+                            onSucces()
+                        }
+                    }, object : Response.ErrorListener{
+                override fun onErrorResponse(error: VolleyError?) {
+                    onFail()
+                }
+            }) {
+                override fun getBody(): ByteArray {
+                    val body = Gson().toJson(controller.pattern)
+                    return body.toByteArray()
+                }
             }
-        })
-        queue.add(stringRequest)
+            queue.add(stringRequest)
+        } else onFail()
 
     }
 

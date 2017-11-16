@@ -22,6 +22,7 @@
         </activity>
         <activity
             android:name=".ListActivity"
+            android:theme="@style/AppTheme"
             android:label="Ledstrips">
         </activity>
     </application>

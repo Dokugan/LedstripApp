@@ -11,6 +11,10 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        var serverAddress = ""
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,7 +30,8 @@ class MainActivity : AppCompatActivity() {
             loadWidget.visibility = View.VISIBLE
             loadWidget.animate()
 
-            handler.getControllers(address.text.toString(), {
+            serverAddress = address.text.toString()
+            handler.getControllers({
 
                 //on success
                 val intent = Intent(this, ListActivity::class.java)
