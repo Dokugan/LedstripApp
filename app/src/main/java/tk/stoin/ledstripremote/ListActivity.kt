@@ -37,15 +37,13 @@ class ListActivity : AppCompatActivity() {
 
                 override fun getChildView(groupPos: Int, childPos: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup?): View? {
 
-                    var newView = convertView
-
-                    if(convertView == null){
+                    var newView: View
                         val layoutInflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                         newView = layoutInflater.inflate(R.layout.list_detail, parent, false)
 
                         val arrayContainer = newView.findViewById<LinearLayout>(R.id.detailArrayholder)
 
-                        val colors = (this.getGroup(groupPos) as LedControllerStatus).pattern.colors
+                        val colors = controllers[groupPos].pattern.colors
                         for (c in colors) {
                             val image = ImageView(applicationContext)
                             image.setImageResource(R.drawable.led_button)
@@ -62,15 +60,13 @@ class ListActivity : AppCompatActivity() {
                             //TODO
                         }
 
-                    }
-
                     return newView
                 }
 
                 override fun getChildId(p0: Int, p1: Int): Long = p1.toLong()
 
                 override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View? {
-                    val title = (this.getGroup(p0) as LedControllerStatus).name
+                    val title = controllers[p0].name
                     var newView = p2
 
                     if(p2 == null){
