@@ -38,7 +38,8 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
         val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         newView = layoutInflater.inflate(R.layout.list_detail, parent, false)
 
-        val arrayContainer = newView.findViewById<LinearLayout>(R.id.detailArrayholder)
+        val arrayContainer = newView.findViewById<LinearLayout>(R.id.detailColor)
+        val deleteContainer = newView.findViewById<LinearLayout>(R.id.detailDelete)
 
         val colors = controllers[groupPos].pattern.colors
         for (c in colors) {
@@ -60,8 +61,9 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                                 }
                             }
 
+                            val scheduledTask = Executors.newScheduledThreadPool(1)
+
                             init {
-                                val scheduledTask = Executors.newScheduledThreadPool(1)
                                 scheduledTask.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS)
                             }
 
@@ -76,7 +78,7 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                             }
 
                             override fun onDialogClosing() {
-                                task.cancel()
+                                scheduledTask.shutdown()
                                 shouldBeUpdated = true
                                 dialogId = -1
                                 notifyDataSetChanged()
@@ -84,6 +86,17 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                         })
             }
             arrayContainer.addView(image)
+
+            val deleteBtn = ImageView(context)
+            deleteBtn.setImageResource(R.drawable.delete_color_button)
+            deleteBtn.setPadding(8,16,8,16)
+            deleteBtn.setOnClickListener {
+                colors.remove(c)
+                controllers[groupPos].syncController(context)
+                notifyDataSetChanged()
+            }
+
+            deleteContainer.addView(deleteBtn)
         }
         val addButton = newView.findViewById<ImageView>(R.id.btnAddLed)
         addButton.setOnClickListener {
@@ -105,7 +118,7 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
         }
 
         if (newView != null) {
-            val titleTextView = newView!!.findViewById<TextView>(R.id.txtStripName)
+            val titleTextView = newView.findViewById<TextView>(R.id.txtStripName)
             titleTextView.text = title
             @Suppress("DEPRECATION")
             titleTextView.setTextColor(resources.getColor(R.color.colorText))
