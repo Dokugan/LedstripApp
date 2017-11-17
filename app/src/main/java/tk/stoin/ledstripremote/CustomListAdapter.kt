@@ -3,9 +3,7 @@ package tk.stoin.ledstripremote
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
-import android.support.v7.app.AppCompatDialog
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
@@ -16,7 +14,9 @@ import com.onegravity.colorpicker.ColorPickerDialog
 import com.onegravity.colorpicker.ColorPickerListener
 import com.onegravity.colorpicker.SetColorPickerListenerEvent
 import java.util.*
-import kotlin.concurrent.timer
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 class CustomListAdapter(val context: Context, val controllers: Array<LedControllerStatus>, val resources: Resources) : BaseExpandableListAdapter() {
 
@@ -61,7 +61,8 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                             }
 
                             init {
-                                Timer().schedule(task, 0.toLong(), 500.toLong())
+                                val scheduledTask = Executors.newScheduledThreadPool(1)
+                                scheduledTask.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS)
                             }
 
                             var shouldBeUpdated = false
@@ -75,8 +76,10 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                             }
 
                             override fun onDialogClosing() {
-                                dialogId = -1
                                 task.cancel()
+                                shouldBeUpdated = true
+                                dialogId = -1
+                                notifyDataSetChanged()
                             }
                         })
             }
