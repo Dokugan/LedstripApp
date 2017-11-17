@@ -1,5 +1,6 @@
 package tk.stoin.ledstripremote
 
+import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*

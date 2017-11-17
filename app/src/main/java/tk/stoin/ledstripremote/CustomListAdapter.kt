@@ -53,7 +53,8 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                 var dialogId = dialog.show()
                 SetColorPickerListenerEvent.setListener(dialogId,
                         object : ColorPickerListener {
-
+                            var shouldBeUpdated = false
+                            val scheduledTask = Executors.newScheduledThreadPool(1)
                             val task = object : TimerTask(){
                                 override fun run() {
                                     shouldBeUpdated = true
@@ -61,13 +62,7 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
                                 }
                             }
 
-                            val scheduledTask = Executors.newScheduledThreadPool(1)
-
-                            init {
-                                scheduledTask.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS)
-                            }
-
-                            var shouldBeUpdated = false
+                            init{scheduledTask.scheduleAtFixedRate(task, 0, 500, TimeUnit.MILLISECONDS)}
 
                             override fun onColorChanged(color: Int) {
                                 if (shouldBeUpdated) {
@@ -100,7 +95,25 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
         }
         val addButton = newView.findViewById<ImageView>(R.id.btnAddLed)
         addButton.setOnClickListener {
-            //TODO
+            val dialog = ColorPickerDialog(context, Color.WHITE, false)
+            var dialogId = dialog.show()
+            SetColorPickerListenerEvent.setListener(dialogId,
+                    object : ColorPickerListener{
+                        var color = tk.stoin.ledstripremote.Color(0,0,0)
+
+                        override fun onColorChanged(newColor: Int) {
+                            color.r = Color.red(newColor).toByte()
+                            color.g = Color.green(newColor).toByte()
+                            color.b = Color.blue(newColor).toByte()
+                        }
+
+                        override fun onDialogClosing() {
+                            controllers[groupPos].pattern.colors.add(color)
+                            controllers[groupPos].syncController(context)
+                            notifyDataSetChanged()
+                            dialogId = -1
+                        }
+                    })
         }
 
         return newView
