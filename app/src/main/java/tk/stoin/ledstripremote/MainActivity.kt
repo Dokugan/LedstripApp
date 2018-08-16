@@ -25,12 +25,23 @@ class MainActivity : AppCompatActivity() {
         val errorText = (findViewById<TextView>(R.id.txtError))
         val handler = HttpHandler(this)
 
+        val sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), android.content.Context.MODE_PRIVATE)
+        serverAddress = sharedPref.getString(getString(R.string.address_preference_key), "")
+        address.setText(serverAddress)
+
         button.setOnClickListener {
             button.visibility = View.INVISIBLE
             loadWidget.visibility = View.VISIBLE
             loadWidget.animate()
 
-            serverAddress = address.text.toString()
+            if (serverAddress != address.text.toString()){
+                serverAddress = address.text.toString()
+                with(sharedPref.edit()){
+                    putString(getString(R.string.address_preference_key), serverAddress)
+                    apply()
+                }
+            }
+
             handler.getControllers({
 
                 //on success

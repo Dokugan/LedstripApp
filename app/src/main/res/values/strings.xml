@@ -4,4 +4,6 @@
     <string name="connect">Connect</string>
     <string name="connection_error">Failed To Connect</string>
     <string name="add_color_button">Add Color Button</string>
+    <string name="preference_file_key">tk.stoin.ledstripremote.SHARED_PREFERENCES_KEY</string>
+    <string name="address_preference_key">tk.stoin.ledtripremote.ADDRESS_KEY</string>
 </resources>
