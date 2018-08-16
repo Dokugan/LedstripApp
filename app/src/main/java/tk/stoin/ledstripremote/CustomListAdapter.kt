@@ -6,10 +6,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseExpandableListAdapter
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import com.onegravity.colorpicker.ColorPickerDialog
 import com.onegravity.colorpicker.ColorPickerListener
 import com.onegravity.colorpicker.SetColorPickerListenerEvent
@@ -121,13 +118,15 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
 
     override fun getChildId(p0: Int, p1: Int): Long = p1.toLong()
 
-    override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View? {
-        val title = controllers[p0].name
+    override fun getGroupView(groupPosition: Int, isExpanded: Boolean, p2: View?, parent: ViewGroup?): View? {
+        val title = controllers[groupPosition].name
         var newView = p2
+
+
 
         if (p2 == null) {
             val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            newView = layoutInflater.inflate(R.layout.list_header, p3, false)
+            newView = layoutInflater.inflate(R.layout.list_header, parent, false)
         }
 
         if (newView != null) {
@@ -135,6 +134,28 @@ class CustomListAdapter(val context: Context, val controllers: Array<LedControll
             titleTextView.text = title
             @Suppress("DEPRECATION")
             titleTextView.setTextColor(resources.getColor(R.color.colorText))
+
+            val switch = newView.findViewById<Switch>(R.id.toggleSwitch)
+            switch.isChecked = controllers[groupPosition].on
+            switch.setOnCheckedChangeListener({_, isChecked ->
+                controllers[groupPosition].on = isChecked
+                val handler = HttpHandler(context)
+                handler.toggleController(controllers[groupPosition].id.toInt(), isChecked, {
+                    notifyDataSetChanged()
+                },{})
+            })
+
+            val collapseButton = newView.findViewById<ImageView>(R.id.collapseButton)
+            if (isExpanded){
+                collapseButton.setImageResource(R.drawable.list_expanded)
+            }
+            else collapseButton.setImageResource(R.drawable.list_collapsed)
+            collapseButton.setOnClickListener {
+                if (isExpanded)
+                    (parent as ExpandableListView).collapseGroup(groupPosition)
+                else
+                    (parent as ExpandableListView).expandGroup(groupPosition, true)
+            }
         }
 
         return newView
